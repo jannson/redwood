@@ -66,6 +66,16 @@ func main() {
 		portsListening++
 	}
 
+	for _, addr := range conf.TproxyAddresses {
+		go func() {
+			err := runTproxyServer(addr)
+			if err != nil && !strings.Contains(err.Error(), "use of closed") {
+				log.Fatalln("Error running transparent HTTPS proxy:", err)
+			}
+		}()
+		portsListening++
+	}
+
 	openPerUserPorts(conf.CustomPorts)
 	portsListening += len(conf.CustomPorts)
 

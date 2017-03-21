@@ -77,6 +77,7 @@ var titleSelector = cascadia.MustCompile("title")
 func (h proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	activeConnections.Add(1)
 	defer activeConnections.Done()
+	log.Println("host", r.Host, "url", r.URL)
 
 	// If a request is directed to Redwood, rather than proxied or intercepted,
 	// it should be handled as an API request.

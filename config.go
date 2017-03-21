@@ -60,6 +60,7 @@ type config struct {
 
 	ProxyAddresses       []string
 	TransparentAddresses []string
+	TproxyAddresses      []string
 
 	ClassifierIgnoredCategories []string
 
@@ -156,6 +157,7 @@ func loadConfiguration() (*config, error) {
 
 	c.stringListFlag("http-proxy", "address (host:port) to listen for proxy connections on", &c.ProxyAddresses)
 	c.stringListFlag("transparent-https", "address to listen for intercepted HTTPS connections on", &c.TransparentAddresses)
+	c.stringListFlag("tproxy-https", "address to listen for tproxy intercepted HTTPS connections on", &c.TproxyAddresses)
 
 	c.stringListFlag("classifier-ignore", "category to omit from classifier results", &c.ClassifierIgnoredCategories)
 
