@@ -4,12 +4,14 @@ import (
 	"errors"
 	"log"
 	"net"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/elico/go-linux-tproxy"
 )
 
-func runTproxyServer(addr string) error {
+func runTproxyTlsServer(addr string) error {
 	ln, err := tproxy.TcpListen(addr)
 	if err != nil {
 		return err
@@ -59,4 +61,27 @@ func runTproxyServer(addr string) error {
 	}
 
 	panic("unreachable")
+}
+
+func runTproxyHttpServer(addr string) error {
+	proxyListener, err := tproxy.TcpListen(addr)
+	if err != nil {
+		return err
+	}
+	if err != nil {
+		log.Fatalf("error listening for connections on %s: %s", addr, err)
+	}
+	go func() {
+		<-shutdownChan
+		proxyListener.Close()
+	}()
+	server := http.Server{Handler: proxyHandler{}}
+	go func() {
+		err := server.Serve(tcpKeepAliveListener{proxyListener.(*net.TCPListener)})
+		if err != nil && !strings.Contains(err.Error(), "use of closed") {
+			log.Fatalln("Error running HTTP proxy:", err)
+		}
+	}()
+
+	return nil
 }
